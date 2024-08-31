@@ -37,7 +37,7 @@ func main() {
 	}
 
 	isNextLineName := false
-	re := regexp.MustCompile(`<a.*?href=["'](.*?)["']`)
+	re := regexp.MustCompile(`href=["'](.*?)["']`) // `<a.*?href=["'](.*?)["']`
 	for _, line := range strings.Split(string(pageContent), "\n") {
 		if strings.Contains(line, "<div") && inPersonBlock{
 			divDepth++
@@ -55,7 +55,8 @@ func main() {
 
 
 		if isNextLineName {
-			nameSlice := strings.Split(strings.TrimSpace(line), " ")[:2]
+		//	nameSlice := strings.Split(strings.TrimSpace(line), " ")[:2]
+		    nameSlice := strings.Fields(strings.TrimSpace(line))[:2]
 			name := strings.Join(nameSlice, " ")
 			currentAmbassadorName = name
 			isNextLineName = false
@@ -78,16 +79,6 @@ func main() {
 			match := re.FindStringSubmatch(line)
 			if match != nil {
 				link := match[1]
-				// slice := ""
-				// for i, val := range match{
-				// 	s := fmt.Sprintf("%v : %v", i, val)
-				//     slice += "\n " + s
-				// 	fmt.Println(s)
-					
-				// }
-				// os.WriteFile("match.text", []byte(slice), 0644)
-
-
 				switch {
 				case strings.Contains(link, socialMap["LinkedIn"]):
 					//fmt.Println(link)
@@ -101,10 +92,6 @@ func main() {
 				ambassadorsData[currentAmbassadorName] = personn
 			}
 		}
-		// _, exists := ambData[currentPersonName]
-		// if !exists {
-		// 	ambData[currentPersonName] = personn
-		// }
 	}
 
 	// fmt.Printf("%+v", ambData)
@@ -126,7 +113,7 @@ func main() {
 }
 
 func GetPageContent(url string) (body []byte, err error) {
-	filename := "amb.html"
+	filename := "amb12.html"
 	file, err := os.Open(filename)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -135,7 +122,7 @@ func GetPageContent(url string) (body []byte, err error) {
 			if err != nil {
 				return nil, err
 			}
-			 //_ = os.WriteFile(filename, body, 0644) // write file to disk
+			 _ = os.WriteFile(filename, body, 0644) // write file to disk
 			return body, nil
 		} else {
 			return nil, fmt.Errorf("unknown error during stating: %w", err)
