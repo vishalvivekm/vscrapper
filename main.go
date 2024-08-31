@@ -10,17 +10,15 @@ import (
 	"regexp"
 	"strings"
 	//"os"
+	"vishalvivekm/vcrawler/sheets"
+	"vishalvivekm/vcrawler/models"
 )
 var (
-ambassadorsData = make(map[string]AmbassadorDetail) 
+ambassadorsData = make(map[string]models.AmbassadorDetail) 
 inPersonBlock bool
 divDepth int
 currentAmbassadorName string
 )
-
-type AmbassadorDetail struct {
-	Name, LinkedInURL, GitHubURL, TwitterUrl  string
-}
 
 var socialMap = map[string]string{
 	"GitHub":   "github.com",
@@ -65,12 +63,11 @@ func main() {
 			isNextLineName = true
 		}
 
-		personn := AmbassadorDetail{}
+		personn := models.AmbassadorDetail{}
 		if currentAmbassadorName != "" {
 			person, exists := ambassadorsData[currentAmbassadorName]
 			if !exists {
-				person = AmbassadorDetail{Name: currentAmbassadorName}
-				personn = person
+				person = models.AmbassadorDetail{Name: currentAmbassadorName}
 			}
 			personn = person
 		}
@@ -109,11 +106,12 @@ func main() {
 		log.Fatal(err)
 	}
 	}
+	sheets.SaveToSheets(ambassadorsData)
 
 }
 
 func GetPageContent(url string) (body []byte, err error) {
-	filename := "amb12.html"
+	filename := "amb.html"
 	file, err := os.Open(filename)
 	if err != nil {
 		if os.IsNotExist(err) {
